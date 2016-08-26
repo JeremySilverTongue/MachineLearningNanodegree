@@ -1,3 +1,5 @@
-
+*/build
 *.pyc
 */.ipynb_checkpoints
+*/.gradle
+!gradle-wrapper.jar
