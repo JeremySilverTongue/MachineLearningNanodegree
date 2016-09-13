@@ -3,3 +3,4 @@
 */.ipynb_checkpoints
 */.gradle
 !gradle-wrapper.jar
+.DS_Store
