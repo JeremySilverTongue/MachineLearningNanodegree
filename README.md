@@ -1,2 +1,2 @@
-# trundl
-Jeremy tries to remember his C++ and impress the robot people
+# Trundl
+Jeremy tries to impress the robot people
