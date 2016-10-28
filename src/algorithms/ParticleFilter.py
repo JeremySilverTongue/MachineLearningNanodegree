@@ -1,8 +1,6 @@
 import random
 
-from collections import namedtuple, Counter
-
-WeightedParticle = namedtuple("WeightedParticle", ['particle', 'weight'])
+from collections import Counter
 
 
 class ParticleFilter:
@@ -89,7 +87,6 @@ def particle_filter_integration_test():
     particle_filter = ParticleFilter(prior_distribution)
 
     print sorted(Counter(particle_filter.particles).items())
-
 
     particle_filter.measure(RED, measurement_model)
     particle_filter.measure(RED, measurement_model)
