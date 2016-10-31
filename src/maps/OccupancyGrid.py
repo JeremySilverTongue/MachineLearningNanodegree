@@ -31,20 +31,20 @@ class OccupancyGrid:
         x, y = position
         step = np.math.sqrt(dx ** 2 + dy ** 2)
 
-        while measurement < max_range and self.occupancy[y][x] == 255:
+        # print self.occupancy.shape, x, y
+        while measurement < max_range and 0 < x < self.occupancy.shape[1] or not 0 < y < self.occupancy.shape[0] and self.occupancy[x][y] == 255:
 
-            print self.occupancy.shape, x, y
-            if not 0 < x < self.occupancy.shape[1] or not 0 < y < self.occupancy.shape[0]:
-                break
-
+            # print self.occupancy.shape, x, y
 
             if img is not None:
                 img[x, y] = (0, 255, 0)
             x += dx
             y += dy
+            # print self.occupancy.shape, x, y
+            if not 0 < x < self.occupancy.shape[1] or not 0 < y < self.occupancy.shape[0]:
+                break
 
             measurement += step
-
 
         return measurement
 
