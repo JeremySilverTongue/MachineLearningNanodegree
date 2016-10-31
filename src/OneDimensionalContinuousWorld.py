@@ -82,13 +82,13 @@ def test():
 
 
 
-    # n, bins, patches = plt.hist(particle_filter.particles, 50, normed=1, facecolor='green', alpha=0.75)
+        # n, bins, patches = plt.hist(particle_filter.particles, 50, normed=1, facecolor='green', alpha=0.75)
 
-    # plt.hist([sample_measurement_distribution(2) for _ in xrange(1000)])
-    # plt.hist([movement_model(2, 2) for _ in xrange(1000)])
+        # plt.hist([sample_measurement_distribution(2) for _ in xrange(1000)])
+        # plt.hist([movement_model(2, 2) for _ in xrange(1000)])
 
 
-    # plt.show()
+        # plt.show()
 
 
 if __name__ == "__main__":

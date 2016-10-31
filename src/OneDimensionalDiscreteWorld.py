@@ -60,22 +60,39 @@ def particle_filter_integration_test():
 
     print sorted(Counter(particle_filter.particles).items())
 
+    print "Measure Red"
     particle_filter.measure(RED, measurement_model)
     print_filter(particle_filter)
+
+    print "Measure Green"
     particle_filter.measure(GREEN, measurement_model)
     print_filter(particle_filter)
 
+    print "Measure Red"
     particle_filter.measure(RED, measurement_model)
+    print "Measure Red"
     particle_filter.measure(RED, measurement_model)
     print_filter(particle_filter)
+
+    print "Move right"
     particle_filter.move(RIGHT, movement_model)
     print_filter(particle_filter)
+
+    print "Measure Green"
     particle_filter.measure(GREEN, measurement_model)
     print_filter(particle_filter)
+
+    print "Move right"
     particle_filter.move(RIGHT, movement_model)
+
+    print "Measure Green"
     particle_filter.measure(GREEN, measurement_model)
     print_filter(particle_filter)
+
+    print "Move right"
     particle_filter.move(RIGHT, movement_model)
+
+    print "Measure Red"
     particle_filter.measure(RED, measurement_model)
     print_filter(particle_filter)
 
