@@ -28,11 +28,13 @@ class OccupancyGrid:
 
     def simple_range_measurement(self, position, dx, dy, max_range=500, img=None):
         measurement = 0
-        x, y = position
+        x, y = position[0], position[1]
+        x, y = int(x), int(y)
         step = np.math.sqrt(dx ** 2 + dy ** 2)
 
         # print self.occupancy.shape, x, y
-        while measurement < max_range and 0 < x < self.occupancy.shape[1] and 0 < y < self.occupancy.shape[0] and self.occupancy[x][y] == 255:
+        while measurement < max_range and 0 < x < self.occupancy.shape[0] and 0 < y < self.occupancy.shape[1] and \
+                        self.occupancy[x][y] == 255:
 
             # print self.occupancy.shape, x, y
 
@@ -41,8 +43,7 @@ class OccupancyGrid:
             x += dx
             y += dy
             # print self.occupancy.shape, x, y
-            if not 0 < x < self.occupancy.shape[1] or not 0 < y < self.occupancy.shape[0]:
-                break
+
 
             measurement += step
 

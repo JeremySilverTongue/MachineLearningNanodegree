@@ -11,15 +11,22 @@ class ParticleFilter:
     def move(self, movement, movement_model):
         self.particles = [movement_model(particle, movement) for particle in self.particles]
 
-    def measure(self, measurement, measurement_model):
+    def measure(self, measurement, measurement_likelihood):
         """ Algorithm from table 4.3 of Probabilistic Robotics by Herr Thrun """
 
-        weights = [measurement_model(measurement, particle) for particle in self.particles]
-        weights = [weight / sum(weights) for weight in weights]
-        self.low_variance_sampler(self.particles, weights)
+        weights = [measurement_likelihood(measurement, particle) for particle in self.particles]
+        if sum(weights) > 0:
+            weights = [weight / sum(weights) for weight in weights]
+            self.low_variance_sampler(self.particles, weights)
+        else:
+            print "We're totally off the scent"
 
     def low_variance_sampler(self, new_particles, weights):
         """ Algorithm from table 4.4 of Probabilistic Robotics by my boy Sebastian"""
+
+
+
+
         self.particles = []
         r = random.random() / self.particle_count
         c = weights[0]
