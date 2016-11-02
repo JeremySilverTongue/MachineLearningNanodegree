@@ -56,7 +56,6 @@ def movement_model(position, intended_movement):
     x = position[0] + intended_movement[0] + distance * random.normalvariate(0, MOVEMENT_VARIANCE)
     y = position[1] + intended_movement[1] + distance * random.normalvariate(0, MOVEMENT_VARIANCE)
 
-
     return (x, y)
 
 
@@ -115,22 +114,49 @@ def draw_bots(real_bot, guesses=None):
 
 
 
-        # canvas.create_line(3 * guess[1],
-        #                    3 * guess[0],
-        #                    3 * guess[1] + 4 * GUESS_RADIUS * math.cos(guess[2]),
-        #                    3 * guess[0] + 4 * GUESS_RADIUS * math.sin(guess[2]),
-        #                    tags=BOT_TAG)
+    # canvas.create_line(3 * guess[1],
+    #                    3 * guess[0],
+    #                    3 * guess[1] + 4 * GUESS_RADIUS * math.cos(guess[2]),
+    #                    3 * guess[0] + 4 * GUESS_RADIUS * math.sin(guess[2]),
+    #                    tags=BOT_TAG)
 
 
 def drawMeasurement(bot, measurement):
     canvas.delete(MEASUREMENT_TAG)
-    canvas.create_line(3 * bot[0], 3 * bot[1],
-                       3 * bot[0],
-                       3 * bot[1] + 3 * measurement[0],
+    canvas.create_line(3 * bot[1], 3 * bot[0],
+                       3 * bot[1],
+                       3 * bot[0] + 3 * measurement[0],
                        tags=MEASUREMENT_TAG,
                        fill="purple"
-
                        )
+
+    canvas.create_line(3 * bot[1], 3 * bot[0],
+                       3 * bot[1] + 3 * measurement[1] / math.sqrt(2),
+                       3 * bot[0] + 3 * measurement[1] / math.sqrt(2),
+                       tags=MEASUREMENT_TAG,
+                       fill="purple"
+                       )
+
+    canvas.create_line(3 * bot[1], 3 * bot[0],
+                       3 * bot[1] + 3 * measurement[2],
+                       3 * bot[0] ,
+                       tags=MEASUREMENT_TAG,
+                       fill="purple"
+                       )
+    #
+    canvas.create_line(3 * bot[1], 3 * bot[0],
+                       3 * bot[1] + 3 * measurement[3] / math.sqrt(2),
+                       3 * bot[0] - 3 * measurement[3]/ math.sqrt(2),
+                       tags=MEASUREMENT_TAG,
+                       fill="purple"
+                       )
+    #
+    # canvas.create_line(3 * bot[1], 3 * bot[0],
+    #                    3 * bot[1],
+    #                    3 * bot[0] + 3 * measurement[0],
+    #                    tags=MEASUREMENT_TAG,
+    #                    fill="purple"
+    #                    )
 
 
 def on_click(event):
@@ -151,27 +177,24 @@ def on_click(event):
     particle_filter.move((event_location[0] - bot[0], event_location[1] - bot[1]), movement_model)
     bot = omm.sample_motion_model(bot, rotation, translation, 0, 0, 0, 0)
     draw_bots(bot, particle_filter.particles)
-    # measure(None)
-
-
-
+    measure(None)
 
 
 def reset(event):
     global particle_filter
-    particle_filter = pf.ParticleFilter(prior_distribution, particle_count=10000)
+    # particle_filter = pf.ParticleFilter(prior_distribution, particle_count=10000)
     # particle_filter.particles = [bot] * 100
     draw_bots(bot, particle_filter.particles)
+
 
 def measure(event):
     measurement = make_measurement(bot, grid, variance=0)
     # print measurement, bot
     # l = measurement_likelihood(measurement, bot)
     # print "Liklihood", l
-    particle_filter.measure(measurement, measurement_likelihood)
+    # particle_filter.measure(measurement, measurement_likelihood)
     draw_bots(bot, particle_filter.particles)
-    # drawMeasurement(bot, measurement)
-
+    drawMeasurement(bot, measurement)
 
 
 reset_button.bind("<Button-1>", reset)
