@@ -21,19 +21,23 @@ frame.pack(fill=X)
 instructions_text = StringVar()
 Label(frame, textvariable=instructions_text).pack(side=LEFT)
 
-set_goal_button = Button(frame, text="Restart")
+set_goal_button = Button(frame, text="Set Goal")
 set_goal_button.pack(side=RIGHT)
 
 setting_goal = True
 goal = None
 
 PATH_TAG = "path"
+GOAL_TAG = "goal"
+
+RADIUS = 5
 
 grid = OccupancyGrid("maps/map.png")
 plan = []
 
 
 def begin_setting_goal(event):
+    canvas.delete(GOAL_TAG)
     canvas.delete(PATH_TAG)
     global setting_goal
     setting_goal = True
@@ -47,24 +51,29 @@ def on_click(event):
         goal = location
         setting_goal = False
         instructions_text.set("Coming up with a new plan of attack!")
-        plan = nav.process_grid(goal, grid.occupancy, grid.danger, danger_weight=10)
+        plan = nav.process_grid(goal, grid.occupancy, grid.danger, danger_weight=100)
         instructions_text.set("Click to see the proposed path!")
-        print plan[0]
+
+        canvas.create_oval(event.x - RADIUS, event.y - RADIUS,
+                           event.x + RADIUS, event.y + RADIUS,
+                           fill="red",
+                           tags=GOAL_TAG
+                           )
 
     else:
         path = nav.get_path(location, plan)
         canvas.delete(PATH_TAG)
-
         canvas.create_line(list(sum([(3 * x + 1.5, 3 * y + 1.5) for y, x in path], ())), tags=PATH_TAG)
+        canvas.create_oval(event.x - RADIUS, event.y - RADIUS,
+                           event.x + RADIUS, event.y + RADIUS,
+                           fill="green",
+                           tags=PATH_TAG
+                           )
 
-        print path
 
-
-instructions_text.set("Welcoem to ")
-
-# reset_button.bind("<Button-1>", reset)
 canvas.bind("<Button-1>", on_click)
 set_goal_button.bind("<Button-1>", begin_setting_goal)
+root.bind("s", begin_setting_goal)
 
 begin_setting_goal(None)
 

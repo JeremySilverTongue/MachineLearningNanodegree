@@ -11,7 +11,24 @@ UP = "up"
 DOWN = "down"
 LEFT = "left"
 RIGHT = "right"
+UP_LEFT = "up_left"
+UP_RIGHT = "up_right"
+DOWN_LEFT = "down_left"
+DOWN_RIGHT = "down_right"
+
 GOAL = "goal"
+
+#
+directions = {
+    RIGHT: (0, 1),
+    UP_RIGHT: (-1, 1),
+    UP: (-1, 0),
+    UP_LEFT: (-1, -1),
+    LEFT: (0, -1),
+    DOWN_LEFT: (1, -1),
+    DOWN: (1, 0),
+    DOWN_RIGHT: (1, 1)
+}
 
 
 def process_grid(goal, occupancy, danger_grid, danger_weight=1):
@@ -23,7 +40,8 @@ def process_grid(goal, occupancy, danger_grid, danger_weight=1):
 
     while not frontier.empty():
         cost_so_far, position = frontier.get()
-        for dy, dx, direction in [(-1, 0, DOWN), (1, 0, UP), (0, 1, LEFT), (0, -1, RIGHT)]:
+        for direction, delta in directions.iteritems():
+            dy, dx = -delta[0], -delta[1]
 
             y, x = neighbor_position = position[0] + dy, position[1] + dx
 
@@ -34,7 +52,7 @@ def process_grid(goal, occupancy, danger_grid, danger_weight=1):
                 if occupancy[y][x] == 1:
                     danger = 1000000
 
-                new_cost = cost_so_far + 1 + danger * danger_weight
+                new_cost = cost_so_far + math.sqrt(dx ** 2+ dy ** 2) + danger * danger_weight
 
                 if visited[y][x][1] is None:
                     frontier.put((new_cost, neighbor_position))
@@ -46,33 +64,9 @@ def process_grid(goal, occupancy, danger_grid, danger_weight=1):
 def get_path(start, plan):
     path = [start]
     y, x = start
-    print plan[y]
     while plan[y][x][1] != GOAL:
-        if plan[y][x][1] == UP:
-            y -= 1
-        elif plan[y][x][1] == DOWN:
-            y += 1
-        elif plan[y][x][1] == LEFT:
-            x -= 1
-        elif plan[y][x][1] == RIGHT:
-            x += 1
-        else:
-            print "Wat"
+        dy, dx = directions[plan[y][x][1]]
+        y += dy
+        x += dx
         path.append((y, x))
     return path
-
-# out = process_grid((2, 2), np.array([
-#     [0, 0, 0],
-#     [0, 1, 0],
-#     [0, 0, 0]
-# ]),
-#                    np.array([
-#                        [.0, .0, .1],
-#                        [.0, 10000, .9],
-#                        [.0, .0, .1]
-#                    ]), danger_weight=1
-#
-#                    )
-#
-# for row in out:
-#     print row
