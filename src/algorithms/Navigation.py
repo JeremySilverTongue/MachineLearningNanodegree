@@ -1,7 +1,7 @@
 import math
 import sys
 from Queue import PriorityQueue
-import numpy as np
+
 
 def heuristic_cost_estimate(location, goal):
     return math.sqrt((location.x - goal.x) ** 2 + (location.y - goal.y) ** 2)
@@ -22,7 +22,6 @@ def process_grid(goal, occupancy, danger_grid, danger_weight=1):
     frontier.put((0, goal))
 
     while not frontier.empty():
-        print frontier
         cost_so_far, position = frontier.get()
         for dy, dx, direction in [(-1, 0, DOWN), (1, 0, UP), (0, 1, LEFT), (0, -1, RIGHT)]:
 
@@ -44,18 +43,36 @@ def process_grid(goal, occupancy, danger_grid, danger_weight=1):
     return visited
 
 
-out = process_grid((2, 2), np.array([
-    [0, 0, 0],
-    [0, 1, 0],
-    [0, 0, 0]
-]),
-                   np.array([
-                       [.0, .0, .1],
-                       [.0, 10000, .9],
-                       [.0, .0, .1]
-                   ]), danger_weight=1
+def get_path(start, plan):
+    path = [start]
+    y, x = start
+    print plan[y]
+    while plan[y][x][1] != GOAL:
+        if plan[y][x][1] == UP:
+            y -= 1
+        elif plan[y][x][1] == DOWN:
+            y += 1
+        elif plan[y][x][1] == LEFT:
+            x -= 1
+        elif plan[y][x][1] == RIGHT:
+            x += 1
+        else:
+            print "Wat"
+        path.append((y, x))
+    return path
 
-                   )
-
-for row in out:
-    print row
+# out = process_grid((2, 2), np.array([
+#     [0, 0, 0],
+#     [0, 1, 0],
+#     [0, 0, 0]
+# ]),
+#                    np.array([
+#                        [.0, .0, .1],
+#                        [.0, 10000, .9],
+#                        [.0, .0, .1]
+#                    ]), danger_weight=1
+#
+#                    )
+#
+# for row in out:
+#     print row

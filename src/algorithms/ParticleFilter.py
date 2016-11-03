@@ -1,7 +1,5 @@
 import random
 
-from collections import Counter
-
 
 class ParticleFilter:
     def __init__(self, prior_distribution, particle_count=1000):
@@ -24,9 +22,6 @@ class ParticleFilter:
     def low_variance_sampler(self, new_particles, weights):
         """ Algorithm from table 4.4 of Probabilistic Robotics by my boy Sebastian"""
 
-
-
-
         self.particles = []
         r = random.random() / self.particle_count
         c = weights[0]
@@ -37,6 +32,3 @@ class ParticleFilter:
                 i += 1
                 c += weights[i]
             self.particles.append(new_particles[i])
-
-
-

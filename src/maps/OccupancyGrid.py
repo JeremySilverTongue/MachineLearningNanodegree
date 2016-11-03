@@ -6,7 +6,7 @@ from scipy.ndimage.filters import gaussian_filter
 
 
 class OccupancyGrid:
-    def __init__(self, file_name, danger_variance, detection_variance):
+    def __init__(self, file_name, danger_variance=5, detection_variance=5):
         img = Image.open(file_name)
         self.occupancy = 1 - np.array(img.convert("L")) / 255
 
@@ -29,14 +29,14 @@ class OccupancyGrid:
         position = int(position[0]), int(position[1])
         if position not in self.measure_memo:
             self.measure_memo[position] = (
-                self.simple_range_measurement(position, 0, 1,  img),
-                self.simple_range_measurement(position, -1, 1,  img),
-                self.simple_range_measurement(position, -1, 0,  img),
-                self.simple_range_measurement(position, -1, -1,  img),
-                self.simple_range_measurement(position, 0, -1,  img),
-                self.simple_range_measurement(position, 1, -1,  img),
-                self.simple_range_measurement(position, 1, 0,  img),
-                self.simple_range_measurement(position, 1, 1,  img)
+                self.simple_range_measurement(position, 0, 1, img),
+                self.simple_range_measurement(position, -1, 1, img),
+                self.simple_range_measurement(position, -1, 0, img),
+                self.simple_range_measurement(position, -1, -1, img),
+                self.simple_range_measurement(position, 0, -1, img),
+                self.simple_range_measurement(position, 1, -1, img),
+                self.simple_range_measurement(position, 1, 0, img),
+                self.simple_range_measurement(position, 1, 1, img)
             )
         return [min(max_range, measurement) for measurement in self.measure_memo[position]]
 
