@@ -6,20 +6,21 @@ from scipy.ndimage.filters import gaussian_filter
 
 
 class OccupancyGrid:
-    def __init__(self, file_name, danger_variance=5, detection_variance=5):
+    def __init__(self, file_name, danger_variance=5, preprocess=True):
         img = Image.open(file_name)
         self.occupancy = 1 - np.array(img.convert("L")) / 255
 
         self.danger = gaussian_filter(1. * self.occupancy, sigma=math.sqrt(danger_variance), mode="constant", cval=1)
-        # self.detection = gaussian_filter(1.*self.occupancy, sigma=math.sqrt(detection_variance), mode="constant", cval=1)
-
-        self.danger = np.maximum(self.danger, self.occupancy)
-        # self.detection = np.maximum(self.danger, self.occupancy)
-
-        # Image.fromarray(self.danger * 255).show()
-        # Image.fromarray(self.detection * 255).show()
+        self.danger = np.maximum(self.danger, self.occupancy * 100000)
 
         self.measure_memo = {}
+        if preprocess:
+            self.preprocess()
+
+    def preprocess(self):
+        for y in xrange(self.occupancy.shape[0]):
+            for x in xrange(self.occupancy.shape[1]):
+                self.eight_way_measurement((y, x))
 
     def eight_way_measurement(self, position, max_range=500, img=None):
         """

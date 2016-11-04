@@ -52,7 +52,7 @@ def process_grid(goal, occupancy, danger_grid, danger_weight=1):
                 if occupancy[y][x] == 1:
                     danger = 1000000
 
-                new_cost = cost_so_far + math.sqrt(dx ** 2+ dy ** 2) + danger * danger_weight
+                new_cost = cost_so_far + math.sqrt(dx ** 2 + dy ** 2) + danger * danger_weight
 
                 if visited[y][x][1] is None:
                     frontier.put((new_cost, neighbor_position))
