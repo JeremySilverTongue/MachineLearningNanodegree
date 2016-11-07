@@ -17,7 +17,7 @@ class OccupancyGrid:
         if preprocess:
             self.preprocess()
 
-    def preprocess(self, event):
+    def preprocess(self, event=None):
         for y in xrange(self.occupancy.shape[0]):
             for x in xrange(self.occupancy.shape[1]):
                 self.eight_way_measurement((y, x))

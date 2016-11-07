@@ -27,7 +27,8 @@ directions = {
     LEFT: (0, -1),
     DOWN_LEFT: (1, -1),
     DOWN: (1, 0),
-    DOWN_RIGHT: (1, 1)
+    DOWN_RIGHT: (1, 1),
+    GOAL: (0, 0)
 }
 
 
