@@ -4,3 +4,7 @@
 */.gradle
 !gradle-wrapper.jar
 .DS_Store
+
+*.iml
+
+*/.idea
