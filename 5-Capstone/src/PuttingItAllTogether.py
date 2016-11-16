@@ -143,7 +143,7 @@ def on_click(event):
 
 def reset_filter(event):
     global particle_filter
-    particle_filter = pf.ParticleFilter(prior_distribution, particle_count=1000)
+    particle_filter = pf.ParticleFilter(prior_distribution, particle_count=10000)
     ui.draw_bots(canvas, bot, particle_filter.particles)
 
 
