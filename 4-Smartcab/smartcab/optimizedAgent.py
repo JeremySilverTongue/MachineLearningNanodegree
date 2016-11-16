@@ -32,8 +32,6 @@ class LearningAgent(Agent):
 
         self.epsilon = self.starting_epsilon * 2 ** (-1. * self.training_trips / 10)
 
-        print self.epsilon, self.training_trips
-
         # self.epsilon -= 0.05
 
         if testing:
@@ -77,7 +75,7 @@ class LearningAgent(Agent):
                     # print "Aggressively exploring", state, self.Q[state]
                     return action
 
-        if random.random() < 0 * self.epsilon or not self.learning:
+        if random.random() < self.epsilon or not self.learning:
             return random.choice([None, 'forward', 'left', 'right'])
         else:
             return max(self.Q[state].iteritems(), key=lambda x: x[1])[0]
@@ -107,7 +105,7 @@ def run():
     agent = env.create_agent(LearningAgent, learning=True, epsilon=1, alpha=.5)
     env.set_primary_agent(agent, enforce_deadline=True)
     sim = Simulator(env, optimized=True, log_metrics=True, display=False, update_delay=0, quiet=True)
-    sim.run(n_test=10, tolerance=.01)
+    sim.run(n_test=10, tolerance=.001)
 
 
 if __name__ == '__main__':
