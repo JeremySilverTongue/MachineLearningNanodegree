@@ -26,20 +26,20 @@ def calculate_safety(data):
                  (data['initial_deadline'] - data['final_deadline']).sum()
 
     if good_ratio == 1:  # Perfect driving
-        return ("A+", "green")
+        return "A+", "green"
     else:  # Imperfect driving
         if data['actions'].apply(lambda x: ast.literal_eval(x)[4]).sum() > 0:  # Major accident
-            return ("F", "red")
+            return "F", "red"
         elif data['actions'].apply(lambda x: ast.literal_eval(x)[3]).sum() > 0:  # Minor accident
-            return ("D", "#EEC700")
+            return "D", "#EEC700"
         elif data['actions'].apply(lambda x: ast.literal_eval(x)[2]).sum() > 0:  # Major violation
-            return ("C", "#EEC700")
+            return "C", "#EEC700"
         else:  # Minor violation
             minor = data['actions'].apply(lambda x: ast.literal_eval(x)[1]).sum()
-            if minor >= len(testing_data) / 2:  # Minor violation in at least half of the trials
-                return ("B", "green")
+            if minor >= len(data) / 2:  # Minor violation in at least half of the trials
+                return "B", "green"
             else:
-                return ("A", "green")
+                return "A", "green"
 
 
 def calculate_reliability(data):

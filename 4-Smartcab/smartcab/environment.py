@@ -105,6 +105,8 @@ class Environment(object):
     def reset(self, testing=False):
         """ This function is called at the beginning of a new trial. """
 
+        if testing:
+            self.enforce_deadline = testing
         self.done = False
         self.t = 0
 
@@ -180,13 +182,14 @@ class Environment(object):
         """ This function is called when a time step is taken turing a trial. """
 
         # Pretty print to terminal
-        print ""
-        print "/-------------------"
-        print "| Step {} Results".format(self.t)
-        print "\-------------------"
-        print ""
+
 
         if (self.verbose == True):  # Debugging
+            print ""
+            print "/-------------------"
+            print "| Step {} Results".format(self.t)
+            print "\-------------------"
+            print ""
             print "Environment.step(): t = {}".format(self.t)
 
         # Update agents, primary first
@@ -275,6 +278,7 @@ class Environment(object):
         light = 'green' if (self.intersections[location].state and heading[1] != 0) or (
         (not self.intersections[location].state) and heading[0] != 0) else 'red'
         inputs = self.sense(agent)
+        waypoint = agent.get_next_waypoint()
 
         # Assess whether the agent can move based on the action chosen.
         # Either the action is okay to perform, or falls under 4 types of violations:
@@ -287,7 +291,7 @@ class Environment(object):
 
         # Reward scheme
         # First initialize reward uniformly random from [-1, 1]
-        reward = 2 * random.random() - 1
+        reward =  2 * random.random() - 1
 
         # Create a penalty factor as a function of remaining deadline
         # Scales reward multiplicatively from [0, 1]
@@ -295,13 +299,15 @@ class Environment(object):
         gradient = 10
 
         # No penalty given to an agent that has no enforced deadline
-        penalty = 0
+
 
         # If the deadline is enforced, give a penalty based on time remaining
         if self.enforce_deadline:
-            penalty = (math.pow(gradient, fnc) - 1) / (gradient - 1)
+            reward -= (math.pow(gradient, fnc) - 1) / (gradient - 1)
 
         # Agent wants to drive forward:
+
+        stuck = False
         if action == 'forward':
             if light != 'green':  # Running red light
                 violation = 2  # Major violation
@@ -330,18 +336,30 @@ class Environment(object):
                 heading = (-heading[1], heading[0])
 
         # Agent wants to perform no action:
-        elif action == None:
-            if light == 'green' and inputs['oncoming'] != 'left':  # No oncoming traffic
-                violation = 1  # Minor violation
+
+        elif action is None:
+
+            if waypoint == "left" and light == "green" and (inputs['oncoming'] == 'forward' or inputs['oncoming'] == 'left'):
+                stuck = True
+            elif light == 'red' and inputs['left'] != 'forward' and waypoint == 'right':
+                violation = 1
+            elif light == "red":
+                stuck = True
+            else:
+                violation = 1
+
+
+
 
         # Did the agent attempt a valid move?
         if violation == 0:
-            if action == agent.get_next_waypoint():  # Was it the correct action?
-                reward += 2 - penalty  # (2, 1)
-            elif action == None and light != 'green':  # Was the agent stuck at a red light?
-                reward += 2 - penalty  # (2, 1)
+            if action == agent.get_next_waypoint() or stuck:  # Was it the correct action?
+                reward += 5
             else:  # Valid but incorrect
-                reward += 1 - penalty  # (1, 0)
+                reward += -1
+
+
+
 
             # Move the agent
             if action is not None:

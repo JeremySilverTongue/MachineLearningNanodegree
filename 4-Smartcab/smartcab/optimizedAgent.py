@@ -1,8 +1,12 @@
 import random
 
+from math import exp
+
 from environment import Agent, Environment
 from planner import RoutePlanner
 from simulator import Simulator
+
+UNEXPLORED = -1000
 
 
 class LearningAgent(Agent):
@@ -19,52 +23,45 @@ class LearningAgent(Agent):
         self.Q = dict()  # Create a Q-table which will be a dictionary of tuples
         self.epsilon = epsilon  # Random exploration factor
         self.alpha = alpha  # Learning factor
-
-        ###########
-        ## TO DO ##
-        ###########
-        # Set any additional class parameters as needed
+        self.testing = False
+        self.training_trips = -1
+        self.starting_epsilon = epsilon
 
     def reset(self, destination=None, testing=False):
-        """ The reset function is called at the beginning of each trial.
-            'testing' is set to True if testing trials are being used
-            once training trials have completed. """
-
-        # Select the destination as the new location to route to
         self.planner.route_to(destination)
 
-        self.epsilon -= 0.005
+        self.training_trips += 1
+
+        self.epsilon = self.starting_epsilon * 2 ** (-1. * self.training_trips / 10)
+
+        print self.epsilon, self.training_trips
+
+        # self.epsilon -= 0.05
 
         if testing:
+            self.learning = True
             self.epsilon = 0
             self.alpha = 0
-
-        return None
+            self.testing = True
 
     def build_state(self):
-        """ The build_state function is called when the agent requests data from the
-            environment. The next waypoint, the intersection inputs, and the deadline
-            are all features available to the agent. """
-
         waypoint = self.planner.next_waypoint()
         inputs = self.env.sense(self)
         deadline = self.env.get_deadline(self)  # Remaining deadline
 
-        state = (waypoint, inputs["light"], inputs["oncoming"], inputs["right"], inputs["left"])
+        if waypoint == 'forward':
+            state = ("waypoint: " + waypoint, inputs["light"])
+        elif waypoint == 'right':
+            state = ("waypoint: " + waypoint, inputs["light"], "left: {}".format(inputs["left"]))
+        else:
+            state = ("waypoint: " + waypoint, inputs["light"], "oncoming: {}".format(inputs["oncoming"]))
+
+        # state = (waypoint, inputs["light"], inputs["oncoming"], inputs["left"])
 
         if self.learning and state not in self.Q:
-            self.Q[state] = {None: 10, 'forward': 10, 'left': 10, 'right': 10}
+            self.Q[state] = {None: UNEXPLORED, 'forward': UNEXPLORED, 'left': UNEXPLORED, 'right': UNEXPLORED}
 
         return state
-
-    def get_max_q(self, state):
-        """ The get_max_Q function is called when the agent is asked to find the
-            maximum Q-value of all actions based on the 'state' the smartcab is in. """
-
-        if state not in self.Q:
-            return random.choice([None, 'forward', 'left', 'right'])
-        else:
-            return max(self.Q[state].iteritems(), key=lambda x: x[1])[0]
 
     def choose_action(self, state):
         """ The choose_action function is called when the agent is asked to choose
@@ -74,17 +71,24 @@ class LearningAgent(Agent):
         self.state = state
         self.next_waypoint = self.planner.next_waypoint()
 
-        if not self.learning or random.random() < self.epsilon:
+        if self.testing:
+            return max(self.Q[state].iteritems(), key=lambda x: x[1])[0]
+        elif self.learning:
+            for action, reward in self.Q[state].iteritems():
+                if reward == UNEXPLORED:
+                    # print "Aggressively exploring", state, self.Q[state]
+                    return action
+
+        if random.random() < 0 * self.epsilon or not self.learning:
             return random.choice([None, 'forward', 'left', 'right'])
         else:
-            return self.get_max_q(state)
+            return max(self.Q[state].iteritems(), key=lambda x: x[1])[0]
 
     def learn(self, state, action, reward):
-        """ The learn function is called after the agent completes an action and
-            receives an award. This function does not consider future rewards
-            when conducting learning. """
-
-        self.Q[state][action] = (1 - self.alpha) * self.Q[state][action] + self.alpha * reward
+        if self.Q[state][action] == UNEXPLORED:
+            self.Q[state][action] = reward
+        else:
+            self.Q[state][action] = (1 - self.alpha) * self.Q[state][action] + self.alpha * reward
 
     def update(self):
         """ The update function is called when a time step is completed in the
@@ -102,10 +106,10 @@ def run():
         Press ESC to close the simulation, or [SPACE] to pause the simulation. """
 
     env = Environment(verbose=False, num_dummies=100, grid_size=(8, 6))
-    agent = env.create_agent(LearningAgent, learning=True, epsilon=1, alpha=.7)
+    agent = env.create_agent(LearningAgent, learning=True, epsilon=1, alpha=.5)
     env.set_primary_agent(agent, enforce_deadline=True)
-    sim = Simulator(env, optimized=False, log_metrics=True, display=False, update_delay=.001)
-    sim.run(n_test=10, tolerance=.05)
+    sim = Simulator(env, optimized=True, log_metrics=True, display=False, update_delay=0, quiet=True)
+    sim.run(n_test=10, tolerance=.01)
 
 
 if __name__ == '__main__':

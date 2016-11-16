@@ -35,13 +35,14 @@ class Simulator(object):
         'gray': (155, 155, 155)
     }
 
-    def __init__(self, env, size=None, update_delay=2.0, display=True, log_metrics=False, optimized=False):
+    def __init__(self, env, size=None, update_delay=2.0, display=True, log_metrics=False, optimized=False, quiet=False):
         self.env = env
         self.size = size if size is not None else (
             (self.env.grid_size[0] + 1) * self.env.block_size, (self.env.grid_size[1] + 2) * self.env.block_size)
         self.width, self.height = self.size
         self.road_width = 44
 
+        self.quiet = quiet
         self.bg_color = self.colors['gray']
         self.road_color = self.colors['black']
         self.line_color = self.colors['mustard']
@@ -157,15 +158,16 @@ class Simulator(object):
                     break
 
             # Pretty print to terminal
+            # if not self.quiet:
             print
-            print "/-------------------------"
+            # print "/-------------------------"
             if testing:
-                print "| Testing trial {}".format(trial)
+                print "Testing trial {}".format(trial)
             else:
-                print "| Training trial {}".format(trial)
+                print "Training trial {}".format(trial)
 
-            print "\-------------------------"
-            print
+                # print "\-------------------------"
+                # print
 
             self.env.reset(testing)
             self.current_time = 0.0
@@ -196,7 +198,8 @@ class Simulator(object):
                         self.last_updated = self.current_time
 
                     # Render text
-                    self.render_text(trial, testing)
+                    if not self.quiet:
+                        self.render_text(trial, testing)
 
                     # Render GUI and sleep
                     if self.display:
@@ -227,11 +230,12 @@ class Simulator(object):
 
             # Trial finished
             if self.env.success == True:
-                print "\nTrial Completed!"
+                print "Trial Completed!"
                 print "Agent reached the destination."
             else:
-                print "\nTrial Aborted!"
+                print "Trial Aborted!"
                 print "Agent did not reach the destination."
+
 
             # Increment
             total_trials = total_trials + 1
