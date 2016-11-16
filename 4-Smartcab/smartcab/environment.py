@@ -233,7 +233,7 @@ class Environment(object):
         location = state['location']
         heading = state['heading']
         light = 'green' if (self.intersections[location].state and heading[1] != 0) or (
-        (not self.intersections[location].state) and heading[0] != 0) else 'red'
+            (not self.intersections[location].state) and heading[0] != 0) else 'red'
 
         # Populate oncoming, left, right
         oncoming = None
@@ -241,7 +241,7 @@ class Environment(object):
         right = None
         for other_agent, other_state in self.agent_states.iteritems():
             if agent == other_agent or location != other_state['location'] or (
-                    heading[0] == other_state['heading'][0] and heading[1] == other_state['heading'][1]):
+                            heading[0] == other_state['heading'][0] and heading[1] == other_state['heading'][1]):
                 continue
             # For dummy agents, ignore the primary agent
             # This is because the primary agent is not required to follow the waypoint
@@ -276,7 +276,7 @@ class Environment(object):
         location = state['location']
         heading = state['heading']
         light = 'green' if (self.intersections[location].state and heading[1] != 0) or (
-        (not self.intersections[location].state) and heading[0] != 0) else 'red'
+            (not self.intersections[location].state) and heading[0] != 0) else 'red'
         inputs = self.sense(agent)
         waypoint = agent.get_next_waypoint()
 
@@ -291,7 +291,7 @@ class Environment(object):
 
         # Reward scheme
         # First initialize reward uniformly random from [-1, 1]
-        reward =  2 * random.random() - 1
+        reward = 2 * random.random() - 1
 
         # Create a penalty factor as a function of remaining deadline
         # Scales reward multiplicatively from [0, 1]
@@ -339,7 +339,8 @@ class Environment(object):
 
         elif action is None:
 
-            if waypoint == "left" and light == "green" and (inputs['oncoming'] == 'forward' or inputs['oncoming'] == 'left'):
+            if waypoint == "left" and light == "green" and (
+                            inputs['oncoming'] == 'forward' or inputs['oncoming'] == 'left'):
                 stuck = True
             elif light == 'red' and inputs['left'] != 'forward' and waypoint == 'right':
                 violation = 1
@@ -348,9 +349,6 @@ class Environment(object):
             else:
                 violation = 1
 
-
-
-
         # Did the agent attempt a valid move?
         if violation == 0:
             if action == agent.get_next_waypoint() or stuck:  # Was it the correct action?
@@ -358,15 +356,13 @@ class Environment(object):
             else:  # Valid but incorrect
                 reward += -1
 
-
-
-
             # Move the agent
             if action is not None:
                 location = (
-                (location[0] + heading[0] - self.bounds[0]) % (self.bounds[2] - self.bounds[0] + 1) + self.bounds[0],
-                (location[1] + heading[1] - self.bounds[1]) % (self.bounds[3] - self.bounds[1] + 1) + self.bounds[
-                    1])  # wrap-around
+                    (location[0] + heading[0] - self.bounds[0]) % (self.bounds[2] - self.bounds[0] + 1) + self.bounds[
+                        0],
+                    (location[1] + heading[1] - self.bounds[1]) % (self.bounds[3] - self.bounds[1] + 1) + self.bounds[
+                        1])  # wrap-around
                 state['location'] = location
                 state['heading'] = heading
         # Agent attempted invalid move

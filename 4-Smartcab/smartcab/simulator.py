@@ -236,7 +236,6 @@ class Simulator(object):
                 print "Trial Aborted!"
                 print "Agent did not reach the destination."
 
-
             # Increment
             total_trials = total_trials + 1
             trial = trial + 1
